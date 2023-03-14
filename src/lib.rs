@@ -3,6 +3,18 @@ use std::ffi::CStr;
 
 /// # Safety
 #[no_mangle]
+pub unsafe extern "C" fn prepare(json_str: *const i8) -> i32 {
+    let string = unsafe { CStr::from_ptr(json_str).to_string_lossy().into_owned() };
+    let value = serde_json::from_str::<Value>(&string);
+    if let Ok(j) = value.and_then(|v| serde_json::to_string_pretty(&v)) {
+        j.len() as i32
+    } else {
+        0
+    }
+}
+
+/// # Safety
+#[no_mangle]
 pub unsafe extern "C" fn pretty(json_str: *const i8, pretty_json: *mut u8) -> i32 {
     if json_str.is_null() {
         return 0;

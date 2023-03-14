@@ -9,6 +9,7 @@
 
 PJ_PATH := "json_prettier.dll"
 JsonPrettier := DllCall("LoadLibrary", "Str", PJ_PATH, "Ptr")
+prepare_proc := DllCall("GetProcAddress", "Ptr", JsonPrettier, "AStr", "prepare", "Ptr")
 pretty_proc := DllCall("GetProcAddress", "Ptr", JsonPrettier, "AStr", "pretty", "Ptr")
 
 pretty(json) {
@@ -20,10 +21,11 @@ pretty(json) {
     required_bytes := StrPut(json, "UTF-8")
     json_utf8 := Buffer(required_bytes, 0)
     StrPut(json, json_utf8, "UTF-8")
-    pretty_json_utf8 := Buffer(required_bytes * 2, 0)
-    ran := DllCall(pretty_proc, "Ptr", json_utf8, "Ptr", pretty_json_utf8, "Int")
+    ran := DllCall(prepare_proc, "Ptr", json_utf8, "Int")
     if ran = 0
         return json
+    pretty_json_utf8 := Buffer(ran, 0)
+    DllCall(pretty_proc, "Ptr", json_utf8, "Ptr", pretty_json_utf8, "Int")
     name := StrGet(pretty_json_utf8, ran, "UTF-8")
     return name
 }
