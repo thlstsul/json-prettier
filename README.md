@@ -20,6 +20,7 @@ pretty(json) {
 	required_bytes := StrPut(json, "UTF-8")
 	json_utf8 := Buffer(required_bytes, 0)
 	StrPut(json, json_utf8, "UTF-8")
+	;程序崩溃时，可适当增加格式化字符串的内存分配大小，暂时没有预估大小的方法
 	pretty_json_utf8 := Buffer(required_bytes * 2, 0)
 	ran := DllCall(pretty_proc, "Ptr", json_utf8, "Ptr", pretty_json_utf8, "Int")
 	if ran = 0
