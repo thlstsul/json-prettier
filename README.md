@@ -54,7 +54,6 @@ pretty_with_clip_changed() {
 		pretty_json_utf8 := Buffer(ran, 0)
 		DllCall(pretty_proc, "Ptr", json_utf8, "Ptr", pretty_json_utf8, "Int")
 		A_Clipboard := StrGet(pretty_json_utf8, ran, "UTF-8")
-		Sleep(1000)
 		ToolTip ; Turn off the tip.
 	}
 }
