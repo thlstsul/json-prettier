@@ -15,7 +15,7 @@ pub unsafe extern "C" fn prepare(json_str: *const i8) -> i32 {
 
 /// # Safety
 #[no_mangle]
-pub unsafe extern "C" fn pretty(json_str: *const i8, pretty_json: *mut u8) -> i32 {
+pub unsafe extern "C" fn prettify(json_str: *const i8, pretty_json: *mut u8) -> i32 {
     if json_str.is_null() {
         return 0;
     }
@@ -46,7 +46,7 @@ mod tests {
         let origin_string = format!("{}\0", r#"{"a":"aa","b":{"bb":"bbb"},"c":["cc"]}"#);
         let mut result = [0_u8; 68];
         unsafe {
-            pretty(origin_string.as_ptr() as *const i8, result.as_mut_ptr());
+            prettify(origin_string.as_ptr() as *const i8, result.as_mut_ptr());
         }
 
         #[rustfmt::skip]
@@ -68,7 +68,7 @@ r#"{
         let origin_string = format!("{}\0", r#"1234567890asdfghjkl"#);
         let mut result = [0_u8; 20];
         unsafe {
-            pretty(origin_string.as_ptr() as *const i8, result.as_mut_ptr());
+            prettify(origin_string.as_ptr() as *const i8, result.as_mut_ptr());
         }
         assert_eq!(String::from_utf8(result.to_vec()).unwrap(), origin_string);
     }
