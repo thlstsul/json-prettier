@@ -1,7 +1,7 @@
 [package]
 name = "json-prettier"
-version = "0.3.0"
-edition = "2021"
+version = "0.3.1"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,7 +10,7 @@ name = "json_prettier"
 crate-type = ["dylib"]
 
 [dependencies]
-serde_json = "1.0.91"
+serde_json = "1.0.149"
 
 [dev-dependencies]
 libloading = "0.7.4"

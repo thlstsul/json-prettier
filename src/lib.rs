@@ -2,26 +2,34 @@ use serde_json::Value;
 use std::ffi::CStr;
 
 /// # Safety
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prepare(json_str: *const i8) -> i32 {
-    let string = unsafe { CStr::from_ptr(json_str).to_string_lossy().into_owned() };
-    let value = serde_json::from_str::<Value>(&string);
-    if let Ok(j) = value.and_then(|v| serde_json::to_string_pretty(&v)) {
-        j.len() as i32
-    } else {
-        0
+    if json_str.is_null() {
+        return 0;
     }
+
+    let string = unsafe { CStr::from_ptr(json_str).to_string_lossy().into_owned() };
+    let Ok(value) = serde_json::from_str::<Value>(&string) else {
+        return 0;
+    };
+
+    let Ok(j) = serde_json::to_string_pretty(&value) else {
+        return 0;
+    };
+    j.len() as i32
 }
 
 /// # Safety
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn prettify(json_str: *const i8, pretty_json: *mut u8) -> i32 {
     if json_str.is_null() {
         return 0;
     }
+
     let mut string = unsafe { CStr::from_ptr(json_str).to_string_lossy().into_owned() };
-    let value = serde_json::from_str::<Value>(&string);
-    if let Ok(j) = value.and_then(|v| serde_json::to_string_pretty(&v)) {
+    if let Ok(value) = serde_json::from_str::<Value>(&string)
+        && let Ok(j) = serde_json::to_string_pretty(&value)
+    {
         string = j;
     }
 
@@ -33,20 +41,22 @@ pub unsafe extern "C" fn prettify(json_str: *const i8, pretty_json: *mut u8) -> 
 }
 
 /// # Safety
-#[no_mangle]
-pub unsafe extern "C" fn deprettify(json_str: *const i8, pretty_json: *mut u8) -> i32 {
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn deprettify(json_str: *const i8, depretty_json: *mut u8) -> i32 {
     if json_str.is_null() {
         return 0;
     }
+
     let mut string = unsafe { CStr::from_ptr(json_str).to_string_lossy().into_owned() };
-    let value = serde_json::from_str::<Value>(&string);
-    if let Ok(j) = value.and_then(|v: Value| serde_json::to_string(&v)) {
+    if let Ok(value) = serde_json::from_str::<Value>(&string)
+        && let Ok(j) = serde_json::to_string(&value)
+    {
         string = j;
     }
 
     let len = string.len();
     unsafe {
-        pretty_json.copy_from(string.as_ptr(), len);
+        depretty_json.copy_from(string.as_ptr(), len);
     }
     len as i32
 }
